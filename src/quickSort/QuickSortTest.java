@@ -21,6 +21,9 @@ public class QuickSortTest {
 		}
 		long q=timer.stop();
 		
+		File log = new File("QuickSortRecords.txt");
+		Outputs.OutputToFile(log,timer.getElapsedTime(q, p));
+		
 		System.out.println(timer.getElapsedTime(q,p));
         System.out.println(k + "th largest is "+ find);
 	}
