@@ -1,0 +1,147 @@
+package algorithms.randomizedSelections;
+import java.io.IOException;
+import java.util.*;
+
+public class Div3 implements RandomizedSelectTemplate{
+
+	   	public int ranSelectionCounter = 0;
+	    public int k;
+	    public long start;
+	    public double avgTime;
+	    public int rsr = -1; //random selector result
+	    public int [] maidanArray = new int [3];
+	    public int maidanArrayElement;
+
+	    @Override
+	    public void kUpdater(int [] A){
+					if(A.length % 2 == 0){
+						k = A.length/2;
+					}else{
+						k = A.length/2 + 1;
+					}    	
+	    }
+
+	    public void populateArray( int [] A, int range){
+	    		int max = A.length;
+	    		Random rng = new Random(); // Ideally just create one instance globally
+			// Note: use LinkedHashSet to maintain insertion order
+			Set<Integer> set = new LinkedHashSet<Integer>();
+			while (set.size() < max){
+				Integer next = rng.nextInt(range) + 1;
+				// As we're adding to a set, this will automatically do a containment check
+				set.add(next);
+			}
+
+			int index = 0;
+			for( Integer i : set ) {
+				A[index++] = i; //note the autounboxing here
+			}
+		}
+
+	    public int pivotSelector(int [] a){
+	    	return (int) (Math.random()* a.length);
+	    	
+	    }
+
+	    public void arrayDivider(int [] a){
+	    	int totalRange = a.length;
+	    	int firstRange = totalRange/3;
+	    	int lastRange = totalRange - (2 * firstRange);
+	    	
+	    	int [] firstArray = new int [firstRange];
+	    	int [] secondArray = new int [firstRange];
+	    	int [] thirdArray = new int [lastRange];
+	    	
+	    	int counter = 0;
+	    	//for the first and second parts
+	    	for (int i = 0; i < firstRange; i++){
+	    		firstArray[i] = a[i];
+	    		secondArray[i] = a[i + firstRange];
+	    		thirdArray[i] = a[i + 2* firstRange];
+	    		counter++;
+	    	}
+	    	
+	    	while (counter < lastRange){
+	    		thirdArray[counter] = a[2* firstRange + counter];
+	    		counter ++;
+	    	}
+	    	
+	    	//printArray(firstArray);
+	    	//printArray(secondArray);
+	    	//printArray(thirdArray);
+	    	
+	    	int p1 = pivotSelector(firstArray);
+	    	int p2 = pivotSelector(secondArray);
+	    	int p3 = pivotSelector(thirdArray);
+	    	    	  	
+	    	int [] pivotArra = new int[3];
+	    	
+	    	RandomizedSelector(firstArray, p1);
+	    	maidanArrayElement++;
+	    	RandomizedSelector(secondArray, p2);
+	    	maidanArrayElement++;
+	    	RandomizedSelector(thirdArray, p3);
+	    	
+	    	
+	    	int pFinal = pivotSelector(maidanArray);
+	    	    	
+	    	RandomizedSelector(maidanArray, pFinal);	
+	    	
+	     }
+
+	    public void RandomizedSelector (int [] a, int p) /*throws ArrayIndexOutOfBoundsException*/{
+	    	int n = a.length, pp;
+	  	// to update the madian location depending on the array size
+		kUpdater(a); 
+		    	
+	    	List<Integer> SarrLst = new ArrayList<Integer>();
+		List<Integer> GarrLst = new ArrayList<Integer>();
+	    	int Sindex = 0, Gindex = 0;
+	    	for (int i = 0; i < n; i++){
+	    		if(a[i] < a[p]){
+	    			SarrLst.add(a[i]);
+	    		}else if (a[i] > a[p]){
+	    			GarrLst.add(a[i]);	
+	    		}
+	    		ranSelectionCounter++;
+	    	}
+	    	
+	    	int [] Sarr = new int[SarrLst.size()];
+	    	for( int i = 0; i < Sarr.length; i++){
+	    		Sarr[i] = SarrLst.get(i).intValue();
+	    	}
+	 
+		int [] Garr = new int[GarrLst.size()];
+	    	for( int i = 0; i < Garr.length; i++){
+	    		Garr[i] = GarrLst.get(i).intValue();
+	    	}
+	    	
+	    	if(Sarr.length == k -1 && Garr.length == a.length - k){
+	    		System.out.println("median " + a[p]);
+	    		maidanArray [maidanArrayElement] = a[p];
+	    	}else if(Sarr.length >= k){
+	    		pp = pivotSelector(Sarr);
+	    		RandomizedSelector (Sarr,pp);
+	    	}else if(Garr.length >= a.length + 1 - k){
+			k = k - Sarr.length - 1;
+	    		pp = pivotSelector(Garr);
+			RandomizedSelector (Garr,pp);
+		}   	
+	    }// end method
+			
+	    public void sort(int arraySize, int randomSize) {
+			int arr [] = new int [arraySize];
+				maidanArrayElement = 0;		
+				ranSelectionCounter = 0;	
+				populateArray(arr, randomSize);
+				arrayDivider(arr);
+		}
+	    
+	    public void printArray(int[] A){
+	    	System.out.println("printing array:");
+	    	for (int i =0; i < A.length; i++){
+	    		System.out.print(A[i] + ", " );
+	    	}
+	    	System.out.println();
+	    }
+}
