@@ -1,0 +1,176 @@
+package algorithms.randomizedSelections;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+public class Div5 implements RandomizedSelectTemplate {
+	
+	public int ranSelectionCounter=0;
+	public int k = 0;
+    public long start;
+    public double avgTime;
+    public int rsr = -1; //random selector result
+    public int [] maidanArray = new int [5]; // divided by 5
+    public int maidanArrayElement;
+
+	@Override
+	public void kUpdater(int[] A) {
+		// TODO Auto-generated method stub
+		if(A.length % 2 == 0){
+			k = A.length/2;
+		}else{
+			k = A.length/2 + 1;
+			System.out.println("K: " + k );
+		}  
+	}
+
+	@Override
+	public void populateArray(int[] A, int range) {
+		// TODO Auto-generated method stub
+		int max = A.length;
+		Random rng = new Random(); // Ideally just create one instance globally
+	// Note: use LinkedHashSet to maintain insertion order
+		Set<Integer> set = new LinkedHashSet<Integer>();
+		while (set.size() < max){
+		Integer next = rng.nextInt(range) + 1;
+		// As we're adding to a set, this will automatically do a containment check
+		set.add(next);
+	}
+
+	int index = 0;
+	for( Integer i : set ) {
+		A[index++] = i; //note the autounboxing here
+	}
+	}
+
+	@Override
+	public int pivotSelector(int[] a) {
+		// TODO Auto-generated method stub
+    	return (int) (Math.random()* a.length);
+	}
+
+	@Override
+	public void arrayDivider(int[] a) {
+		// TODO Auto-generated method stub
+		int totalRange = a.length;
+    	int firstRange = totalRange/5;
+    	int lastRange = totalRange - (4 * firstRange);
+    	
+    	int [] firstArray = new int [firstRange];
+    	int [] secondArray = new int [firstRange];
+    	int [] thirdArray = new int [lastRange];
+    	int [] fourthArray = new int [lastRange];
+    	int [] fithArray = new int [lastRange];
+    	
+    	int counter = 0;
+    	//for the 1st, 2nd, 3rd, and 4th  parts
+    	for (int i = 0; i < firstRange; i++){
+    		firstArray[i] = a[i];
+    		secondArray[i] = a[i + firstRange];
+    		thirdArray[i] = a[i + 2* firstRange];
+    		fourthArray[i] = a[i + 3* firstRange];
+    		fithArray[i] = a[i + 4* firstRange];
+    		counter++;
+}
+    	
+    	while (counter < lastRange){
+    		thirdArray[counter] = a[2* firstRange + counter];
+    		counter ++;
+    	}
+    	
+    	//printArray(firstArray);
+    	//printArray(secondArray);
+    	//printArray(thirdArray);
+    	
+    	int p1 = pivotSelector(firstArray);
+    	int p2 = pivotSelector(secondArray);
+    	int p3 = pivotSelector(thirdArray);
+    	int p4 = pivotSelector(fourthArray);
+    	int p5 = pivotSelector(fithArray);
+    	    	  	
+    	int [] pivotArra = new int[5];
+    	
+    	RandomizedSelector(firstArray, p1);
+    	maidanArrayElement++;
+    	RandomizedSelector(secondArray, p2);
+    	maidanArrayElement++;
+    	RandomizedSelector(thirdArray, p3);
+    	maidanArrayElement++;
+    	RandomizedSelector(fourthArray, p4);
+    	maidanArrayElement++;
+    	RandomizedSelector(fithArray, p5);
+    	
+    	
+    	printArray(maidanArray);
+    	
+    	int pFinal = pivotSelector(maidanArray);
+    	    	
+    	RandomizedSelector(maidanArray, pFinal);
+	}
+
+	@Override
+	public void RandomizedSelector(int[] a, int p) {
+		// TODO Auto-generated method stub
+		int n = a.length, pp;
+	  	// to update the madian location depending on the array size
+		kUpdater(a); 
+		    	
+	    	List<Integer> SarrLst = new ArrayList<Integer>();
+	    	List<Integer> GarrLst = new ArrayList<Integer>();
+	    	int Sindex = 0, Gindex = 0;
+	    	for (int i = 0; i < n; i++){
+	    		if(a[i] < a[p]){
+	    			SarrLst.add(a[i]);
+	    		}else if (a[i] > a[p]){
+	    			GarrLst.add(a[i]);	
+	    		}
+	    		ranSelectionCounter++;
+	    	}
+	    	
+	    	int [] Sarr = new int[SarrLst.size()];
+	    	for( int i = 0; i < Sarr.length; i++){
+	    		Sarr[i] = SarrLst.get(i).intValue();
+	    	}
+	 
+		int [] Garr = new int[GarrLst.size()];
+	    	for( int i = 0; i < Garr.length; i++){
+	    		Garr[i] = GarrLst.get(i).intValue();
+	    	}
+	    	
+	    	if(Sarr.length == k -1 && Garr.length == a.length - k){
+	    		System.out.println("median " + a[p]);
+	    		maidanArray [maidanArrayElement] = a[p];
+	    	}else if(Sarr.length >= k){
+	    		pp = pivotSelector(Sarr);
+	    		RandomizedSelector (Sarr,pp);
+	    	}else if(Garr.length >= a.length + 1 - k){
+			k = k - Sarr.length - 1;
+	    		pp = pivotSelector(Garr);
+			RandomizedSelector (Garr,pp);
+		}   	
+	}
+
+	@Override
+	public void sort(int arraySize, int randomSize) {
+		// TODO Auto-generated method stub
+		int arr [] = new int [arraySize];
+		maidanArrayElement = 0;	
+		ranSelectionCounter = 0;	
+		populateArray(arr, randomSize);
+		arrayDivider(arr);
+	}
+
+	@Override
+	public void printArray(int[] A) {
+		// TODO Auto-generated method stub
+		System.out.println("printing array:");
+		for (int i =0; i < A.length; i++){
+			System.out.print(A[i] + ", " );
+		}
+		System.out.println();
+	}
+
+}
