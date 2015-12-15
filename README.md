@@ -8,3 +8,7 @@ For NetBeans, create a project with the same name, move everything in the src to
 
 In order to make this run, you also have to download the JFreeChart API
 www.jfree.org
+
+Update Dec 14, 2015:
+A Main Window is added as a hub to test all the algorithms. Run mainWindow/MainWindow.java as Java application.
+Note: JavaFX components are used and hence the program has to be run in JRE 8.
